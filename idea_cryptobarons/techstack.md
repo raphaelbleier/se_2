@@ -127,12 +127,45 @@
 | Component | Technology | Hosting Target |
 |-----------|------------|----------------|
 | Android App (Game Client) | Kotlin Native | Device / Emulator (APK distribution) |
-| Web Leaderboard Interface | HTML5 / CSS3 / Vanilla JS | Spring Boot static resources **or** GitHub Pages |
-| Spring Boot Backend | Kotlin or Java | Render, Heroku, or equivalent PaaS |
-| PostgreSQL Database | PostgreSQL | Supabase, Render DB, or equivalent DBaaS |
+| Web Leaderboard Interface | HTML5 / CSS3 / Vanilla JS | Served from Spring Boot static resources (ships with the JAR) |
+| Spring Boot Backend | Kotlin or Java | **University server** — deployed as a fat JAR |
+| PostgreSQL Database | PostgreSQL | University server **or** cloud DBaaS (Supabase free tier) |
 | Gemini API | Google API | Consumed from backend (no direct hosting) |
 | CI/CD | GitHub Actions | GitHub |
 | Code Quality | SonarCloud | sonarcloud.io |
+
+### University Server Deployment
+
+The backend is packaged as a self-contained executable JAR:
+
+```bash
+# 1. Build
+./gradlew bootJar
+# Output: build/libs/crypto-barons-backend.jar
+
+# 2. Copy to server
+scp build/libs/crypto-barons-backend.jar user@university-server:/opt/cryptobarons/
+
+# 3. Run on server (environment variables set separately, never in source code)
+java -jar /opt/cryptobarons/crypto-barons-backend.jar \
+  --spring.profiles.active=prod \
+  --server.port=8080
+```
+
+**Environment variables required on server:**
+```
+DB_URL=jdbc:postgresql://localhost:5432/cryptobarons
+DB_USERNAME=...
+DB_PASSWORD=...
+JWT_SECRET=...
+GEMINI_API_KEY=...
+```
+
+**Known constraints:**
+- HTTPS availability depends on the university server configuration — treat as HTTP until confirmed
+- If HTTPS is unavailable, Android app must allow cleartext traffic for the server's IP (`network_security_config.xml`)
+- Port must be confirmed with the university IT department
+- The web leaderboard UI is served from `http://<university-server>:<port>/leaderboard/` — no separate hosting needed
 
 ---
 

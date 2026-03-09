@@ -7,8 +7,9 @@ The system follows a client-server architecture with two distinct frontend clien
 - **Android App** — native game client (Kotlin, real-time multiplayer)
 - **Web Leaderboard Interface** — browser-based static page (HTML/JS, public read-only)
 
-Both clients communicate with the same **Spring Boot Backend**, which persists data in
-**PostgreSQL**. The AI layer (Gemini API) is integrated exclusively on the server side.
+Both clients communicate with the same **Spring Boot Backend**, deployed as a fat JAR on
+the **university's Linux server**. Data is persisted in **PostgreSQL** (university server
+or cloud DBaaS). The AI layer (Gemini API) is integrated exclusively on the server side.
 
 ---
 
@@ -38,7 +39,7 @@ Both clients communicate with the same **Spring Boot Backend**, which persists d
 ┌───────────────────────────────────────────────────────────────────────────────────┐
 │                    SPRING BOOT BACKEND                                            │
 │                    (Kotlin or Java)                                               │
-│                    Cloud PaaS (Render/Heroku)                                     │
+│                    University Server — fat JAR, java -jar                         │
 │                                                                 │
 │  ┌─────────────────┐  ┌─────────────────┐                     │
 │  │  REST API Layer │  │  WebSocket Layer │                     │
@@ -190,4 +191,4 @@ Parse response → extract sentiment (BULLISH / BEARISH)
 | Cheat validation | Server-side authoritative — client cannot self-report wealth |
 | Biometric result | Android confirms locally, server validates session token |
 | Input validation | All REST inputs validated with Bean Validation (`@Valid`) |
-| HTTPS | TLS enforced on all endpoints (PaaS default) |
+| HTTPS / HTTP | TLS depends on university server config — treat as HTTP until confirmed; if HTTP only, enable Android cleartext traffic for server IP via `network_security_config.xml` |

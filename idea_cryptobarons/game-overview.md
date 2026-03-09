@@ -37,7 +37,7 @@ The first player to accumulate **1,000,000,000 FD (1 Billion Freedom Dollars)** 
 
 ## Player Count & Platform
 
-- **Players:** 2–6 (multiplayer over network)
+- **Players:** 2–6 per session (multiplayer over network)
 - **Platform:** Native Android App (min. SDK 26)
 - **Session Type:** Real-time networked multiplayer via WebSockets
 

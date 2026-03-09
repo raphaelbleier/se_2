@@ -314,5 +314,6 @@ val fallbackPosts = mapOf(
 
 | Sprint | AI Engine Tasks |
 |--------|----------------|
-| **Sprint 2** | Basic Gemini API integration in backend; REST endpoint to test LLM call; static fallback texts displayed in Android feed ticker |
-| **Sprint 3** | Full prompt engineering with all personas; sentiment-to-multiplier algorithm complete; real-time WebSocket delivery of AI posts to all clients |
+| **Sprint 1 (23.03–20.04)** | Gemini API PoC (single hardcoded call, logged response); `SocialPost` entity defined; FeedEntry WebSocket message format agreed |
+| **Sprint 2 (27.04–18.05)** | `SocialPostService` complete; player post → Gemini → market impact pipeline working; autonomous AI event posts with static fallback; FreedomFeed Android panel live |
+| **Sprint 3 (01.06–15.06)** | All 4 personas with full system prompts; AI reaction posts (40% probability); Verified multiplier + stacking cap; FreedomFeed fully polished |

@@ -134,11 +134,12 @@ Gemini AI server-side. WebSockets for real-time everything. CI/CD from day one.
 | What | How |
 |------|-----|
 | Android app | Kotlin, Min SDK 26, Retrofit + OkHttp |
-| Backend | Spring Boot (Kotlin or Java), REST + WebSocket |
-| Database | PostgreSQL on cloud DBaaS |
+| Backend | Spring Boot (Kotlin or Java), REST + WebSocket, deployed as fat JAR |
+| Server | University Linux server — `java -jar` deployment |
+| Database | PostgreSQL (university server or Supabase) |
 | AI | Gemini API — server-side only, never in the APK |
 | Infrastructure | GitHub Actions CI, SonarCloud quality gates |
-| Leaderboard Web UI | Vanilla HTML/JS, served publicly |
+| Leaderboard Web UI | Vanilla HTML/JS, served from the same JAR at `/leaderboard/` |
 
 Every piece of game logic lives on the server. The Android app is a display and input layer.
 The backend is the source of truth. The AI never touches the client directly.
@@ -152,28 +153,27 @@ integration and hardware sensor features. It also happens to be extremely funny.
 
 | Developer | Owns | Core challenge |
 |-----------|------|---------------|
-| Dev 1 | CI/CD, deployment, server setup | Get the whole thing running in the cloud from day one |
-| Dev 2 | Game engine, cards, AI integration | State machine + Gemini API + market algorithm |
-| Dev 3 | WebSocket multiplayer | Real-time sync across 2–6 phones simultaneously |
-| Dev 4 | Android UI, FreedomFeed | Make it feel like a real social media app inside a game |
-| Dev 5 | Cheat gesture + biometric auth | Two-finger swipe detection + fingerprint API |
-| Dev 6 | Leaderboard backend + database | Rankings, stats, persistence |
-| Dev 7 | Web leaderboard interface | Public browser leaderboard page |
+| Dev 1 | Auth + Infrastructure + Web Leaderboard UI | Get the JAR running on the university server, auth working, CI green |
+| Dev 2 | Game Engine + Core Game Screen | State machine, all 7 cards, market algorithm, main Android screen |
+| Dev 3 | Multiplayer & Lobby | Real-time WebSocket sync across 2–6 phones simultaneously |
+| Dev 4 | AI & FreedomFeed | Gemini sentiment analysis, AI personas, FreedomFeed Android panel |
+| Dev 5 | Leaderboard + Cheat + Hardware | Biometric auth, two-finger swipe detection, Congressional Hearing |
 
-Each person fully owns their feature: analysis, design, implementation, tests. This satisfies
-the grading requirement and means nobody is a passive passenger.
+Each person fully owns their feature: analysis, design, backend implementation, Android
+frontend implementation, and tests. Nobody is purely a backend or purely a frontend developer.
+This satisfies the grading requirement and means nobody is a passive passenger.
 
 ---
 
 ## The Timeline
 
 ```
-March → April         April → May            May → June
-─────────────────     ────────────────────   ──────────────────────────
-Sprint 1              Sprint 2               Sprint 3
-Infrastructure        Core gameplay          Hardware + social features
-Review: 14./16.04     Review: 11./12.05      Reviews: 09./11./16./18.06
-                                             Presentations: 22.–25.06
+March                  April        May                    June
+───────────────────────────────────────────────────────────────────
+Sprint 1               Sprint 2                Sprint 3
+23.03 ──────── 20.04   27.04 ────── 18.05      01.06 ──── 15.06
+23.03  13.04  20.04    27.04 04.05 11.05 18.05  01.06 08.06 15.06
+Foundation             Core gameplay           Hardware + AI + finish
 ```
 
 Sprint 1 is about getting the skeleton working. Sprint 2 is the game actually running end to

@@ -36,16 +36,18 @@
 
 ## Individual Requirements (Mandatory for Each Team Member)
 
-Each developer **must** demonstrate full ownership of their assigned feature by providing:
+The team has **5 developers**. Each developer must own at least one complete feature
+end-to-end — **both backend and Android frontend** — not just one layer.
 
 | Deliverable | Evidence |
 |-------------|---------|
 | **Analysis** | User stories / acceptance criteria in GitHub Issues or project board |
 | **Design** | UML diagrams, API contracts, or DB schema contributions (documented) |
-| **Implementation** | Code commits attributed to the developer's GitHub account |
-| **Testing** | Unit tests and/or integration tests with coverage evidence in SonarCloud |
+| **Implementation** | Backend service/controller **and** Android screen(s) — commits attributed to developer's GitHub account |
+| **Testing** | Unit tests and integration tests for both backend and Android — coverage visible in SonarCloud |
 
 > **Failure to fulfill any one of these four areas for your feature results in individual grade reduction.**
+> A developer who only implements backend or only implements frontend does not satisfy this requirement.
 
 ---
 
@@ -60,10 +62,15 @@ Each developer **must** demonstrate full ownership of their assigned feature by 
 
 | Event | Date(s) |
 |-------|---------|
-| Sprint 1 Review | 14.04.2026 and 16.04.2026 |
-| Sprint 2 Review | 11.05.2026 and 12.05.2026 |
-| Sprint 3 Review | 09.06.2026, 11.06.2026, 16.06.2026, 18.06.2026 |
-| Final Presentations | 22.06.2026 – 25.06.2026 |
+| Sprint 1 — Kickoff / Planning | 23.03.2026 |
+| Sprint 1 — Mid-sprint Review | 13.04.2026 |
+| Sprint 1 — Sprint Review | 20.04.2026 |
+| Sprint 2 — Planning | 27.04.2026 |
+| Sprint 2 — Weekly Reviews | 04.05.2026, 11.05.2026 |
+| Sprint 2 — Sprint Review | 18.05.2026 |
+| Sprint 3 — Planning | 01.06.2026 |
+| Sprint 3 — Mid-sprint Review | 08.06.2026 |
+| Sprint 3 — Final Review | 15.06.2026 |
 
 ---
 
@@ -117,7 +124,7 @@ The team must document and be able to present:
 The final deliverable (end of Sprint 3) must include:
 
 - [ ] Installable Android APK (Min SDK 26, tested on real device or emulator)
-- [ ] Spring Boot backend deployed and reachable at stable URL
+- [ ] Spring Boot backend JAR deployed and reachable on university server
 - [ ] PostgreSQL database with production data persisted
 - [ ] All planned features implemented and demonstrable
 - [ ] Source code on GitHub with full commit history
