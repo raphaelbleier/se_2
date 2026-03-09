@@ -57,10 +57,11 @@ See `game-mechanics.md` for detailed phase rules.
 
 ## Key Features
 
-- **AI-Driven Market Commentary** — Gemini API generates satirical social feed posts
+- **FreedomFeed — Player-Driven Social Manipulation** — Players post short messages that move asset prices via real-time Gemini sentiment analysis; bluffing, FUD, and coordinated pumps are core strategies
+- **AI-Driven Market Commentary** — AI personas react autonomously to game events and player posts
 - **Cheat Mechanic** — Hidden two-finger swipe gesture triggers secret fund transfer
 - **Hardware Integration** — Biometric fingerprint sensor used for in-game "oath" verification
-- **Persistent Leaderboard** — Global rankings stored in PostgreSQL, accessible via REST API
+- **Persistent Leaderboard** — Global rankings stored in PostgreSQL, accessible via Android app and browser
 - **Card-Based Market Manipulation** — 5 core card archetypes with cascading effects
 
 ---
@@ -70,7 +71,8 @@ See `game-mechanics.md` for detailed phase rules.
 | Pillar | Mechanic |
 |--------|----------|
 | Corruption | Cards grant passive income, immunity from regulation |
-| Insider Trading | Pre-buying assets before announcing a pump |
-| Market Manipulation | Inverting losses to profits via "Alternative Facts" |
+| Insider Trading | Pre-buying assets before announcing a pump via FreedomFeed |
+| Market Manipulation via Social Media | Player posts analyzed by AI; sentiment directly moves prices — just like real-world tweets |
+| Coordinated Pump & Dump | Multiple players stacking FreedomFeed posts amplifies price swings |
 | Political Immunity | "Presidential Pardon" nullifies punishment |
-| Social Media Chaos | AI-generated capslock tweets move asset prices |
+| AI Amplification | AI personas react to player posts, amplifying or countering the intended effect |

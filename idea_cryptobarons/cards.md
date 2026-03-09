@@ -174,12 +174,85 @@ When a Congressional Hearing is successfully initiated against you, you may play
 
 ---
 
+---
+
+### Card 6: "Suppress the Post"
+
+| Property | Value |
+|----------|-------|
+| **Type** | Censorship / Countermeasure |
+| **Phase** | Lobbying Phase (reactive) |
+| **Rarity** | Uncommon |
+| **Cost** | 0 FD |
+
+**Effect:**
+Target one player's FreedomFeed post submitted this Lobbying Phase.
+
+The targeted post is **removed from the feed** and its market impact is **nullified** — the
+sentiment multiplier is zeroed out before the price update at phase end.
+
+The targeted player is notified with: *"Your post has been removed for violating Community
+Standards."* (no FD penalty for the poster, but their market manipulation attempt fails)
+
+**Stacking:** If the targeted post was a Verified post, the Suppression still works — but costs
+**2 copies** of this card instead of 1.
+
+**Satirical Flavor:**
+> *"Congratulations! Your post has been reviewed and found to violate our policies on
+> coordinated inauthentic behavior. We take the integrity of our platform very seriously."*
+
+---
+
+### Card 7: "Echo Chamber"
+
+| Property | Value |
+|----------|-------|
+| **Type** | Social Amplification |
+| **Phase** | Lobbying Phase |
+| **Rarity** | Rare |
+| **Cost** | 0 FD |
+
+**Effect:**
+Select one FreedomFeed post from the current round (by any player or AI).
+That post's market impact multiplier is **tripled** for the price calculation at the end of
+this Lobbying Phase.
+
+Can be played on your own post (post → ×3 impact) or on an AI persona post (free amplification
+with no cost — the AI "goes viral").
+
+**Interaction:** If played on an opponent's bearish post about your asset, it dramatically
+accelerates the price drop. Best used on your own bullish post.
+
+**Satirical Flavor:**
+> *"The algorithm has decided this post deserves to reach 40 million accounts.
+> Engagement is up 8,400%. Advertisers are thrilled."*
+
+---
+
+## Card Rarity Distribution in Deck
+
+| Rarity | Card | Count in Deck (per session) |
+|--------|------|-----------------------------|
+| Uncommon | 3AM Capslock Tweet | 8 |
+| Uncommon | Suppress the Post | 6 |
+| Rare | Alternative Facts | 5 |
+| Rare | Nepotism Board Member | 4 |
+| Rare | Echo Chamber | 4 |
+| Legendary | The Ultimate Rug Pull | 2 |
+| Very Rare | Presidential Pardon | 3 |
+
+*Total: 32 cards for a 4-player game (scale with player count)*
+
+---
+
 ## Card Interaction Matrix
 
 | Card | Countered By | Synergizes With |
 |------|-------------|-----------------|
-| 3AM Capslock Tweet | Alternative Facts (opponent plays same round) | Buy assets first → instant profit |
+| 3AM Capslock Tweet | Alternative Facts (opponent plays same round) | Buy assets first + post bullishly → double pump |
 | Alternative Facts | Congressional Hearing (fraudulent accounting) | After a losing News-Cycle event |
 | Nepotism Board Member | Congressional Hearing (if challenged) | Rug Pull (funds the setup cost) |
-| The Ultimate Rug Pull | Congressional Hearing during setup | Nepotism Board Member (immunity during setup) |
+| The Ultimate Rug Pull | Congressional Hearing during setup | Post FreedomFeed hype during setup rounds |
 | Presidential Pardon | N/A | 3AM Tweet or Rug Pull (high-risk plays) |
+| Suppress the Post | Echo Chamber (play Echo first, then opponent suppresses) | Best against coordinated pump attempts |
+| Echo Chamber | Suppress the Post | Own Verified post for ×6 total market impact |

@@ -13,36 +13,59 @@ prices and provides narrative flavor to market events.
 
 ## System Architecture
 
+The AI engine serves two distinct functions:
+
+1. **Autonomous Event Posts** — AI reacts to game events (card plays, crashes, rug pulls) with persona-driven commentary
+2. **Player Post Analysis** — AI analyzes player-written FreedomFeed posts for market sentiment, then optionally generates a reaction post from an AI persona
+
 ```
-Game Event / Card Trigger
-         │
-         ▼
-AiSentimentService (Spring Boot)
-         │
-         ├── Build system prompt (persona + context)
-         │
-         ▼
-Gemini API (async HTTP call, server-side)
-         │
-         ▼
-Parse LLM Response
-         │
-         ├── Extract sentiment score (BULLISH / BEARISH / NEUTRAL)
-         │         │
-         │         └──► MarketService.applyVolatility(asset, sentimentMultiplier)
-         │
-         └── Format commentary text
-                   │
-                   └──► WebSocketController.broadcastFeedEntry(sessionId, entry)
-                                 │
-                                 └──► Android clients: In-Game Ticker / Social Feed
+┌─────────────────────────────────────────────────────────────────┐
+│  TRIGGER A: Game Event / Card Play                              │
+│  TRIGGER B: Player FreedomFeed Post                             │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ▼
+         AiSentimentService (Spring Boot)
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+   [Event trigger]      [Player post trigger]
+          │                     │
+          ▼                     ▼
+  Build persona prompt   Analyze player text for:
+  (persona + event ctx)  - sentiment (BULLISH/BEARISH)
+          │               - mentioned asset
+          │                     │
+          └──────────┬──────────┘
+                     │
+                     ▼
+         Gemini API (async, server-side)
+                     │
+                     ▼
+             Parse LLM Response
+                     │
+        ┌────────────┼────────────────┐
+        │            │                │
+        ▼            ▼                ▼
+  Extract        Apply market    [Player post only]
+  sentiment      multiplier      Generate AI persona
+  score          to asset        reaction post (40%
+        │            │           probability)
+        │            │                │
+        └────────────┴────────────────┘
+                     │
+                     ▼
+     WebSocketController.broadcastFeedEntry(sessionId, entry)
+                     │
+                     ▼
+        Android clients: FreedomFeed / Social Feed Ticker
 ```
 
 ---
 
 ## Trigger Events
 
-The following game events trigger an asynchronous Gemini API call:
+### Game Event Triggers (Autonomous AI Posts)
 
 | Trigger | Persona Used | Sentiment Bias |
 |---------|-------------|----------------|
@@ -56,6 +79,21 @@ The following game events trigger an asynchronous Gemini API call:
 | News-Cycle Event (any) | Market Analyst | Variable |
 | Congressional Hearing initiated | Legal Expert | Bearish (suspicion) |
 | Nepotism Board Member played | Sycophant Reporter | Bullish |
+
+### Player FreedomFeed Post Triggers (Sentiment Analysis + Optional Reaction)
+
+Every player post triggers **two Gemini calls** (or one combined call):
+
+1. **Sentiment Analysis Call** — classifies the player's post text → market multiplier
+2. **Reaction Post Call** (40% probability) — generates an AI persona reaction to the player's post
+
+| Player Post Type | Analysis Goal | Likely AI Reaction Persona |
+|-----------------|---------------|---------------------------|
+| Bullish claim about an asset | Extract asset + BULLISH score | Crypto Bro amplifies / Regulator warns |
+| Bearish claim / FUD | Extract asset + BEARISH score | Politician blames enemies / Crypto Bro dismisses |
+| Vague/meme post | NEUTRAL or low-confidence score | Crypto Bro emoji spam |
+| Post mentioning another player | N/A for market | Legal Expert (suspicion of market manipulation) |
+| Obvious coordinated pump (3+ bullish posts same asset, same round) | Aggregate STRONGLY_BULLISH | Regulator opens inquiry |
 
 ---
 
@@ -174,20 +212,50 @@ finalPrice = currentPrice × (1 + eventBaseMultiplier + sentimentMultiplier)
 
 ---
 
+## Player Post Sentiment Analysis Prompt
+
+When a player submits a FreedomFeed post, this prompt is used for analysis:
+
+**System Prompt (Sentiment Extraction):**
+```
+You are a financial sentiment analysis engine for a satirical crypto trading game.
+A player has posted the following message to the in-game social feed.
+Analyze the text and determine:
+1. The overall market sentiment expressed (STRONGLY_BULLISH, BULLISH, NEUTRAL, BEARISH, STRONGLY_BEARISH)
+2. Which in-game asset is most likely mentioned or implied: PATRIOTCOIN, LIBERTYDOGE, CUSTOM_TOKEN, or GENERAL_MARKET
+3. Whether this post appears to be deliberate manipulation (true/false)
+
+Take the post at face value — do not attempt to detect bluffing.
+Output format: JSON { "sentiment": "...", "asset": "...", "isManipulation": true/false }
+```
+
+**Example player post:** `"Just went ALL IN on PatriotCoin. This is it. The moment history will remember. WAGMI 🚀"`
+
+**Example analysis output:**
+```json
+{ "sentiment": "STRONGLY_BULLISH", "asset": "PATRIOTCOIN", "isManipulation": true }
+```
+
+---
+
 ## Social Feed UI (Android)
 
-The generated AI commentary is displayed in an **In-Game Ticker / Social Feed**:
+The FreedomFeed is a **unified social timeline** combining player posts and AI posts:
 
-- Implemented as a horizontally scrolling ticker at the top of the game screen
-- New entries slide in from the right (animated)
-- Each entry shows: persona avatar icon, username (fictional), and generated text
-- Color-coded by sentiment: green for BULLISH, red for BEARISH, grey for NEUTRAL
-- Tapping an entry shows full text in a modal dialog
+- Full-screen scrollable feed panel, toggled from the main game screen
+- Player posts appear with the player's avatar and username
+- AI posts appear with the persona's fictional avatar and handle
+- Color-coded border by source: **blue** = player post, **orange** = AI autonomous post
+- Color-coded sentiment badge: green for BULLISH, red for BEARISH, grey for NEUTRAL
+- Tapping any post shows the full text and its recorded market impact
+- A text input field at the bottom allows posting (character counter, 280 max)
+- Remaining free posts for the round shown as a counter (e.g. "1 free post remaining")
 
-**WebSocket Message Format (Server → Client):**
+**WebSocket Message Format — AI Post (Server → Client):**
 ```json
 {
   "type": "FEED_ENTRY",
+  "source": "AI",
   "sessionId": "abc123",
   "timestamp": "2026-05-15T14:32:00Z",
   "persona": "IRRATIONAL_POLITICIAN",
@@ -195,7 +263,25 @@ The generated AI commentary is displayed in an **In-Game Ticker / Social Feed**:
   "text": "SAD! PATRIOTCOIN IS BEING ATTACKED BY THE DEEP STATE!",
   "sentiment": "BULLISH",
   "triggeredBy": "CARD_3AM_TWEET",
-  "affectedAsset": "PATRIOTCOIN"
+  "affectedAsset": "PATRIOTCOIN",
+  "marketImpact": 0.24
+}
+```
+
+**WebSocket Message Format — Player Post (Server → Client):**
+```json
+{
+  "type": "FEED_ENTRY",
+  "source": "PLAYER",
+  "sessionId": "abc123",
+  "timestamp": "2026-05-15T14:33:10Z",
+  "playerId": "player_uuid",
+  "username": "PatriotBaron",
+  "verified": false,
+  "text": "Just went ALL IN on PatriotCoin. This is it. WAGMI 🚀",
+  "analyzedSentiment": "STRONGLY_BULLISH",
+  "affectedAsset": "PATRIOTCOIN",
+  "marketImpact": 0.31
 }
 ```
 

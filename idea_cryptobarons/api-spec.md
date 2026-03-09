@@ -191,6 +191,100 @@ Sell a crypto asset during the Lobbying Phase.
 
 ---
 
+### POST `/sessions/{sessionId}/social/post`
+Submit a player post to the FreedomFeed.
+
+**Request:**
+```json
+{
+  "text": "Just went ALL IN on PatriotCoin. This is it. WAGMI 🚀",
+  "verified": false
+}
+```
+
+**Response `200 OK`:**
+```json
+{
+  "postId": "uuid",
+  "text": "Just went ALL IN on PatriotCoin. This is it. WAGMI 🚀",
+  "analyzedSentiment": "STRONGLY_BULLISH",
+  "affectedAsset": "PATRIOTCOIN",
+  "marketImpact": 0.31,
+  "freePosts Remaining": 0,
+  "broadcastedToFeed": true
+}
+```
+
+**Error `429 Too Many Requests`** (no free posts and insufficient FD for paid post):
+```json
+{
+  "error": "NO_FREE_POSTS_REMAINING",
+  "message": "You have used your free post this round. Additional posts cost 5,000,000 FD.",
+  "costFD": 5000000,
+  "yourBalance": 3000000
+}
+```
+
+---
+
+### POST `/sessions/{sessionId}/social/verify`
+Activate "Verified" status for the current round (doubles post market impact).
+
+**Request:** *(no body — costs 50,000,000 FD, deducted automatically)*
+
+**Response `200 OK`:**
+```json
+{
+  "verified": true,
+  "costFD": 50000000,
+  "newBalance": 450000000,
+  "validForRound": 5
+}
+```
+
+---
+
+### GET `/sessions/{sessionId}/social/feed`
+Retrieve full FreedomFeed history for a session (paginated).
+
+**Query params:** `?page=0&size=50`
+
+**Response `200 OK`:**
+```json
+{
+  "entries": [
+    {
+      "postId": "uuid",
+      "source": "PLAYER",
+      "username": "PatriotBaron",
+      "verified": false,
+      "text": "Just went ALL IN on PatriotCoin. WAGMI 🚀",
+      "analyzedSentiment": "STRONGLY_BULLISH",
+      "affectedAsset": "PATRIOTCOIN",
+      "marketImpact": 0.31,
+      "timestamp": "2026-05-15T14:33:10Z",
+      "round": 4
+    },
+    {
+      "postId": "uuid",
+      "source": "AI",
+      "persona": "IRRATIONAL_POLITICIAN",
+      "username": "@RealDonalDuck45",
+      "text": "SAD! THE DEEP STATE IS ATTACKING PATRIOTCOIN!",
+      "analyzedSentiment": "BULLISH",
+      "affectedAsset": "PATRIOTCOIN",
+      "marketImpact": 0.18,
+      "timestamp": "2026-05-15T14:33:15Z",
+      "round": 4
+    }
+  ],
+  "totalElements": 47,
+  "page": 0
+}
+```
+
+---
+
 ### POST `/sessions/{sessionId}/actions/cheat`
 (Internal — triggered server-side by validated gesture event from client)
 Executes a "Taxpayer Bailout" transfer.
@@ -333,8 +427,8 @@ wss://<backend-host>/ws
 | Topic | Description | Payload Type |
 |-------|-------------|-------------|
 | `/topic/game/{sessionId}` | Full game state updates | `GameStateMessage` |
-| `/topic/feed/{sessionId}` | AI social feed entries | `FeedEntryMessage` |
-| `/topic/market/{sessionId}` | Asset price updates | `MarketUpdateMessage` |
+| `/topic/feed/{sessionId}` | FreedomFeed entries (player posts + AI posts) | `FeedEntryMessage` |
+| `/topic/market/{sessionId}` | Asset price updates (including post-driven changes) | `MarketUpdateMessage` |
 | `/user/queue/audit` | Private audit notifications | `AuditNotificationMessage` |
 | `/user/queue/errors` | Private error messages | `ErrorMessage` |
 

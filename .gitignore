@@ -1,0 +1,139 @@
+# ============================================================
+# CREDENTIALS & SECRETS — NEVER COMMIT
+# ============================================================
+*.env
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+*secret*
+*Secret*
+*SECRET*
+*credential*
+*Credential*
+*CREDENTIAL*
+secrets/
+local.properties
+
+# Spring Boot application properties with secrets
+application-local.yml
+application-local.yaml
+application-local.properties
+application-prod.yml
+application-prod.yaml
+application-prod.properties
+application-secrets.yml
+application-secrets.yaml
+application-secrets.properties
+
+# Google / Gemini API keys
+google-services.json
+gemini-key*
+*api-key*
+*apikey*
+
+# ============================================================
+# ANDROID / KOTLIN
+# ============================================================
+*.iml
+.gradle/
+local.properties
+.idea/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+.DS_Store
+build/
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Android signing
+keystore/
+*.keystore
+*.jks
+release/
+signing.properties
+keystore.properties
+
+# ============================================================
+# SPRING BOOT / JAVA / KOTLIN BACKEND
+# ============================================================
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ============================================================
+# IDE
+# ============================================================
+.idea/
+*.iws
+*.ipr
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vscode/
+*.sublime-workspace
+
+# ============================================================
+# OS
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# LOGS & TEMP
+# ============================================================
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.orig

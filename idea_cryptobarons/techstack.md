@@ -5,7 +5,7 @@
 
 ---
 
-## Frontend
+## Frontend A — Android App (Game Client)
 
 | Property | Specification |
 |----------|---------------|
@@ -17,11 +17,31 @@
 | **UI Framework** | Android Views / XML Layouts (or Jetpack Compose — team decision, document choice) |
 | **Architecture Pattern** | MVVM recommended (ViewModel + LiveData / StateFlow) |
 
-### Frontend Constraints
+### Android Frontend Constraints
 - No cross-platform frameworks (no Flutter, React Native, Xamarin)
 - No web views as primary UI
 - Biometric authentication via `BiometricPrompt` API (AndroidX Biometric)
 - Gesture detection for cheat mechanic via `GestureDetector` / `MotionEvent`
+
+---
+
+## Frontend B — Web Leaderboard Interface
+
+| Property | Specification |
+|----------|---------------|
+| **Type** | Static web page (no server-side rendering required) |
+| **Language** | HTML5, CSS3, Vanilla JavaScript (ES2020+) |
+| **Data Access** | `fetch()` API calling the existing REST leaderboard endpoints |
+| **Hosting** | Served as static resources from Spring Boot (`/src/main/resources/static/`) **or** deployed separately via GitHub Pages |
+| **Auto-Refresh** | Poll `GET /api/v1/leaderboard/{category}` every 30 seconds |
+| **Authentication** | Public endpoints only — no login required to view leaderboard |
+
+### Web Frontend Constraints
+- No heavy SPA framework required — vanilla JS is sufficient and preferred for simplicity
+- Must be responsive (readable on desktop and tablet)
+- Must display all 3 leaderboard categories: "Biggest Rug Pull", "Most Pardons Used", "Top 1% Elite"
+- No separate build pipeline needed; if hosted via Spring Boot static folder, it deploys with the backend automatically
+- CORS must be configured on the backend to allow browser requests (add `@CrossOrigin` or global `CorsConfiguration` in Spring Security)
 
 ---
 
@@ -106,7 +126,8 @@
 
 | Component | Technology | Hosting Target |
 |-----------|------------|----------------|
-| Android Frontend | Kotlin Native | Device / Emulator (APK distribution) |
+| Android App (Game Client) | Kotlin Native | Device / Emulator (APK distribution) |
+| Web Leaderboard Interface | HTML5 / CSS3 / Vanilla JS | Spring Boot static resources **or** GitHub Pages |
 | Spring Boot Backend | Kotlin or Java | Render, Heroku, or equivalent PaaS |
 | PostgreSQL Database | PostgreSQL | Supabase, Render DB, or equivalent DBaaS |
 | Gemini API | Google API | Consumed from backend (no direct hosting) |

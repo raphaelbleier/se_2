@@ -2,32 +2,43 @@
 
 ## Overview
 
-The system follows a strict client-server architecture with three tiers:
-**Android Client → Spring Boot Backend → PostgreSQL Database**
+The system follows a client-server architecture with two distinct frontend clients:
 
-The AI layer (Gemini API) is integrated exclusively on the server side.
+- **Android App** — native game client (Kotlin, real-time multiplayer)
+- **Web Leaderboard Interface** — browser-based static page (HTML/JS, public read-only)
+
+Both clients communicate with the same **Spring Boot Backend**, which persists data in
+**PostgreSQL**. The AI layer (Gemini API) is integrated exclusively on the server side.
 
 ---
 
 ## Architecture Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        ANDROID CLIENTS                          │
-│                                                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
-│  │  Player 1    │  │  Player 2    │  │  Player N    │         │
-│  │  Android App │  │  Android App │  │  Android App │         │
-│  │  (Kotlin)    │  │  (Kotlin)    │  │  (Kotlin)    │         │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘         │
-│         │ Retrofit (REST)  │ OkHttp (WS)     │                 │
-└─────────┼──────────────────┼─────────────────┼─────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│                              ANDROID CLIENTS (Game)                               │
+│                                                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                           │
+│  │  Player 1    │  │  Player 2    │  │  Player N    │                           │
+│  │  Android App │  │  Android App │  │  Android App │                           │
+│  │  (Kotlin)    │  │  (Kotlin)    │  │  (Kotlin)    │                           │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘                           │
+│         │ Retrofit (REST)  │ OkHttp (WS)     │                                   │
+└─────────┼──────────────────┼─────────────────┼───────────────────────────────────┘
           │                  │                 │
+          │         ┌────────────────────┐     │
+          │         │  WEB LEADERBOARD   │     │
+          │         │  INTERFACE         │     │
+          │         │  (HTML/CSS/JS)     │     │
+          │         │  Browser or        │     │
+          │         │  GitHub Pages      │     │
+          │         └────────┬───────────┘     │
+          │                  │ fetch() REST     │
           ▼                  ▼                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    SPRING BOOT BACKEND                          │
-│                    (Kotlin or Java)                             │
-│                    Cloud PaaS (Render/Heroku)                   │
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│                    SPRING BOOT BACKEND                                            │
+│                    (Kotlin or Java)                                               │
+│                    Cloud PaaS (Render/Heroku)                                     │
 │                                                                 │
 │  ┌─────────────────┐  ┌─────────────────┐                     │
 │  │  REST API Layer │  │  WebSocket Layer │                     │
@@ -66,7 +77,7 @@ The AI layer (Gemini API) is integrated exclusively on the server side.
 
 ## Component Responsibilities
 
-### Android Client (Frontend)
+### Android Client (Game Frontend)
 
 | Responsibility | Implementation |
 |----------------|---------------|
@@ -77,6 +88,16 @@ The AI layer (Gemini API) is integrated exclusively on the server side.
 | Biometric authentication | AndroidX BiometricPrompt API |
 | Display AI social feed | WebSocket-pushed ticker in RecyclerView/LazyColumn |
 | Login / Registration | REST API calls with JWT token storage |
+
+### Web Leaderboard Interface (Browser Frontend)
+
+| Responsibility | Implementation |
+|----------------|---------------|
+| Display all 3 leaderboard categories | `fetch()` → `GET /api/v1/leaderboard/{category}` |
+| Auto-refresh rankings | `setInterval()` polling every 30 seconds |
+| Responsive layout | Pure HTML5 + CSS3 (Flexbox/Grid), no framework required |
+| Hosting | Static files in Spring Boot `/resources/static/leaderboard/` **or** GitHub Pages |
+| No authentication | Leaderboard endpoints are public — no JWT required |
 
 ### Spring Boot Backend (Server)
 

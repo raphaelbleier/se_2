@@ -52,6 +52,7 @@ where:
 3. Each player may play **up to 2 cards** per Lobbying Phase
 4. Card effects are applied immediately and confirmed server-side
 5. Players may also buy/sell assets during this phase using current market prices
+6. Players may post to the **FreedomFeed** to manipulate market sentiment (see below)
 
 **Hand Size:** 5 cards per player (replenished to 5 at start of each round)
 
@@ -59,6 +60,98 @@ where:
 - Buy/sell any listed asset at current market price
 - Transaction recorded server-side with timestamp for audit purposes
 - Purchases made before a "3AM Capslock Tweet" are traceable
+
+---
+
+## FreedomFeed — Player Social Posts & Market Manipulation
+
+The **FreedomFeed** is a shared in-game social media timeline, visible to all players in real time.
+Players can post short messages to manipulate market sentiment, bluff other players, and trigger
+AI reactions — exactly as powerful figures move real markets with social media posts.
+
+> *"Why issue a press release when a single post in all caps moves billions?"*
+
+### Posting Rules
+
+| Rule | Value |
+|------|-------|
+| Max post length | 280 characters |
+| Free posts per Lobbying Phase | 1 per player |
+| Additional posts | 5,000,000 FD each ("Paid Promotion") |
+| Timing | Any time during the Lobbying Phase |
+| Visibility | Broadcast instantly to all players via WebSocket |
+
+### How Posts Move Markets
+
+When a player submits a post, the backend sends it to the **Gemini API** for sentiment analysis.
+The AI extracts:
+1. **Sentiment** (BULLISH / BEARISH / STRONGLY_BULLISH / STRONGLY_BEARISH / NEUTRAL)
+2. **Mentioned asset** (PatriotCoin, LibertyDoge, any Custom Token, or "market general")
+
+The extracted sentiment is converted to a **market multiplier** and applied to the mentioned asset's
+price at the **end of the current Lobbying Phase** — after all players have posted and traded.
+
+```
+Player post submitted
+       │
+       ▼
+SocialPostService.analyze(postText, playerId, sessionId)  [async, server-side]
+       │
+       ▼
+Gemini API: sentiment analysis of player's text
+       │
+       ▼
+Extract: sentiment + mentioned asset
+       │
+       ├── Apply volatility multiplier to asset price (queued, applied at phase end)
+       │
+       ├── Broadcast post to all players via /topic/feed/{sessionId}
+       │
+       └── Trigger AI persona reaction post (with probability, see ai-engine.md)
+```
+
+### Strategic Depth: Bluffing & Manipulation
+
+Posts are **not fact-checked** by the game engine. Players can post anything:
+
+| Strategy | Example Post | Intent |
+|----------|-------------|--------|
+| **Pump** | "Just bought 10,000 PatriotCoin. This is the moment. 🚀" | Drive up price before selling |
+| **FUD** (Fear, Uncertainty, Doubt) | "Heard rumors the PatriotCoin dev team just rage-quit. Not financial advice." | Drive down price before buying |
+| **Misdirection** | "LibertyDoge is about to moon, trust me bro" | Distract others while you buy PatriotCoin |
+| **Coordinated Pump** | Multiple players post bullishly about same asset | Stack sentiment multipliers |
+| **False Flag** | Post bearish content about your own asset, buy the dip you created | Advanced manipulation |
+
+> Other players must decide whether to **believe and trade** on the post, or **ignore it as FUD**.
+> The AI takes all posts at face value and reacts accordingly.
+
+### Verified Checkmark (FD Multiplier)
+
+Players may spend **50,000,000 FD** at the start of a round to activate **"Verified" status**
+for that round. This doubles the market impact multiplier of all their FreedomFeed posts for
+that round, simulating how high-profile accounts move markets more than anonymous ones.
+
+| Status | Market Multiplier | Cost |
+|--------|------------------|------|
+| Normal post | 1× base sentiment multiplier | Free (1 per round) |
+| Verified post | 2× base sentiment multiplier | 50,000,000 FD / round |
+| Additional post | 1× base sentiment multiplier | 5,000,000 FD / post |
+
+### Stacking Posts (Multiple Players)
+
+If multiple players post bullishly about the same asset in the same Lobbying Phase, the sentiment
+multipliers **stack additively**, up to a maximum cap of **+3.0× combined**. This makes coordinated
+posting (or coordinated FUD) a powerful team strategy — but also a visible signal to alert opponents.
+
+```
+Combined multiplier = sum of all individual post multipliers (capped at ±3.0)
+```
+
+### Post History & Audit
+
+All posts are stored in the database with `playerId`, `timestamp`, `text`, `analyzedSentiment`,
+and `affectedAsset`. During the Audit Phase, any player can tap a post in the feed to see its
+recorded market impact — making coordinated manipulation visible in hindsight.
 
 ---
 
@@ -179,9 +272,20 @@ AUDIT_PHASE                                          │
 
 | Asset | Base Price (FD) | Base Volatility | Special Rules |
 |-------|----------------|-----------------|---------------|
-| PatriotCoin | 1,000 | ±15% per round | Affected by "3AM Tweet" card |
-| LibertyDoge | 500 | ±25% per round | Meme multiplier on AI hype posts |
-| Custom Token | Player-set | 100% → 0 | Destroyed on "Rug Pull" execution |
+| PatriotCoin | 1,000 | ±15% per round | Affected by "3AM Tweet" card and player posts |
+| LibertyDoge | 500 | ±25% per round | Extra meme multiplier on player hype posts (×1.5) |
+| Custom Token | Player-set | 100% → 0 | Destroyed on "Rug Pull" execution; player posts during setup inflate price |
+
+### Full Price Formula (with Social Posts)
+
+```
+finalPrice = currentPrice
+           × (1 + baseVolatility × eventMultiplier × aiEventSentiment)
+           × (1 + clamp(sum(playerPostMultipliers), -3.0, +3.0))
+```
+
+*The event layer (News-Cycle + AI) and the social layer (player posts + AI reactions) are
+applied multiplicatively, making a coordinated round of both cards and posts extremely powerful.*
 
 ---
 
@@ -190,6 +294,7 @@ AUDIT_PHASE                                          │
 | Phase | Duration |
 |-------|---------|
 | News-Cycle Phase | 10 seconds (server-controlled) |
-| Lobbying Phase | 90 seconds per player turn |
+| Lobbying Phase | 90 seconds per player turn (cards + trades + posts) |
+| FreedomFeed posting window | Concurrent with Lobbying Phase (not a separate timer) |
 | Audit Phase | 30 seconds + hearing time |
 | Congressional Hearing | 5 seconds for accused to authenticate |

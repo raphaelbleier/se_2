@@ -40,8 +40,8 @@ running prototype demonstrating connectivity between Android client and Spring B
 - [ ] Deploy first "Hello World" backend to cloud PaaS (Render/Heroku)
 
 #### Dev 2 (Core Game Engine) — Sprint 1 Focus
-- [ ] Define REST API contracts (OpenAPI/Swagger spec draft)
-- [ ] Design database schema (ERD for all entities)
+- [ ] Define REST API contracts (OpenAPI/Swagger spec draft) — including FreedomFeed endpoints
+- [ ] Design database schema (ERD for all entities) — include `social_posts` table
 - [ ] Implement Player entity + repository (JPA)
 - [ ] Implement basic authentication (register/login + JWT)
 
@@ -64,7 +64,15 @@ running prototype demonstrating connectivity between Android client and Spring B
 #### Dev 6 (Leaderboard & Persistence) — Sprint 1 Focus
 - [ ] Define leaderboard database schema
 - [ ] Implement basic REST endpoint `GET /leaderboard/{category}` (static test data)
+- [ ] Enable CORS on leaderboard endpoints (required for web browser access)
 - [ ] Design Android leaderboard screen (static mockup)
+
+#### Dev 7 (Web Leaderboard Interface) — Sprint 1 Focus
+- [ ] Create web UI folder structure (`/web-leaderboard/` or in Spring Boot static resources)
+- [ ] Design HTML wireframe/mockup for the 3-tab leaderboard page
+- [ ] Implement basic `index.html` + `styles.css` skeleton (static placeholder data)
+- [ ] Confirm REST endpoint format with Dev 6 (agree on JSON response schema)
+- [ ] Decide hosting strategy: Spring Boot static resources vs. GitHub Pages (document decision)
 
 ### Sprint 1 Definition of Done
 - [ ] GitHub Actions pipeline passes on PR to `develop`
@@ -72,6 +80,7 @@ running prototype demonstrating connectivity between Android client and Spring B
 - [ ] Backend deployed and reachable at cloud URL
 - [ ] Android app connects to backend (login works end-to-end)
 - [ ] Biometric PoC demonstrated on device
+- [ ] Web leaderboard page skeleton accessible in browser (static data)
 
 ---
 
@@ -92,9 +101,11 @@ Implement the core game loop, card mechanics, multiplayer synchronization, AI in
 - [ ] Implement News-Cycle Phase event generation
 - [ ] Implement Lobbying Phase turn management
 - [ ] Implement Audit Phase transaction sync
-- [ ] Implement all 5 card effects (3AM Tweet, Alternative Facts, Nepotism, Rug Pull, Pardon)
-- [ ] Implement market price algorithm (volatility model)
-- [ ] **Basic Gemini API integration** — single endpoint test, fallback texts working
+- [ ] Implement all 7 card effects (3AM Tweet, Alternative Facts, Nepotism, Rug Pull, Pardon, Suppress the Post, Echo Chamber)
+- [ ] Implement market price algorithm (volatility model) — including social post multiplier layer
+- [ ] **Basic Gemini API integration** — event posts + fallback texts working
+- [ ] Implement `SocialPostService` — accepts player post text, calls Gemini for sentiment, queues market impact
+- [ ] Implement free-post-per-round counter and paid-post FD deduction logic
 
 #### Dev 3 (Network & Sync)
 - [ ] Full WebSocket game state synchronization (all phases)
@@ -106,7 +117,9 @@ Implement the core game loop, card mechanics, multiplayer synchronization, AI in
 #### Dev 4 (Android UI)
 - [ ] Functional game screen (hand of cards, asset prices, balance)
 - [ ] Card play interaction (select, confirm, animate)
-- [ ] AI news ticker (scrolling, sentiment-colored)
+- [ ] **FreedomFeed panel** — unified feed of player posts + AI posts, sentiment-colored
+- [ ] **Post input field** — 280-char text input, submit button, free-post counter display
+- [ ] AI news ticker (scrolling, sentiment-colored) — now shows both AI and player posts
 - [ ] Lobby screen (create/join/list sessions)
 
 #### Dev 5 (Hardware & Anti-Cheat)
@@ -120,16 +133,24 @@ Implement the core game loop, card mechanics, multiplayer synchronization, AI in
 - [ ] Android leaderboard screen (live data from REST API)
 - [ ] Database persistence for all game session stats
 
+#### Dev 7 (Web Leaderboard Interface)
+- [ ] Implement `leaderboard.js` — `fetch()` calls to all 3 REST endpoints
+- [ ] Render leaderboard tables dynamically from API response data
+- [ ] Implement tab switching between the 3 leaderboard categories
+- [ ] Add `setInterval` auto-refresh (every 30 seconds)
+- [ ] Style page with `styles.css` — responsive layout, game theme
+
 #### Dev 1 (DevOps)
 - [ ] Enhance CI pipeline: add test stage, coverage report
 - [ ] Update SonarCloud quality gate thresholds (coverage ≥ 70%)
-- [ ] Ensure cloud deployment pipeline works for both repos
+- [ ] Ensure cloud deployment pipeline works for all repos (backend + web UI if separate)
 
 ### Sprint 2 Definition of Done
 - [ ] Full 2-player game round playable end-to-end (all 3 phases)
 - [ ] At least 3 card types functional
 - [ ] AI feed showing posts (fallback texts at minimum)
-- [ ] Leaderboard persisted and viewable in app
+- [ ] Leaderboard persisted and viewable in Android app
+- [ ] Web leaderboard page live with real data from backend REST API
 - [ ] All new code passes SonarCloud Quality Gate
 
 ---
@@ -154,8 +175,10 @@ and finalize the application for delivery.
 - [ ] End-to-end test: cheat → accused → hearing → biometric → verdict
 
 #### Dev 2 (Core Game Engine)
-- [ ] Complete Gemini prompt engineering (all 4 personas)
-- [ ] Implement sentiment → market multiplier algorithm
+- [ ] Complete Gemini prompt engineering (all 4 personas, player post analysis prompt)
+- [ ] Implement sentiment → market multiplier algorithm (event layer + social post layer combined)
+- [ ] Implement AI persona reaction to player posts (40% probability trigger)
+- [ ] Implement "Verified" post multiplier (×2) and stacking cap (±3.0)
 - [ ] Server-side Congressional Hearing validation logic
 - [ ] Asset confiscation / penalty enforcement
 
@@ -166,6 +189,9 @@ and finalize the application for delivery.
 
 #### Dev 4 (Android UI)
 - [ ] Finalize all screens (polish, error states, loading states)
+- [ ] FreedomFeed: show recorded market impact per post (tap to expand)
+- [ ] FreedomFeed: visual distinction between player posts (blue) and AI posts (orange)
+- [ ] Verified badge display on player posts
 - [ ] Integrate leaderboard in post-game summary screen
 - [ ] Hearing notification UI (5-second countdown + biometric dialog)
 - [ ] Accessibility pass (content descriptions, contrast ratios)
@@ -174,6 +200,13 @@ and finalize the application for delivery.
 - [ ] Real-time leaderboard updates during active session
 - [ ] Historical stats per player (profile screen)
 - [ ] Final database migration scripts
+
+#### Dev 7 (Web Leaderboard Interface)
+- [ ] Polish web UI: loading states, error handling (when backend is unreachable)
+- [ ] Ensure page is fully responsive (desktop + tablet)
+- [ ] Final deployment: confirm web page is accessible at stable public URL
+- [ ] Write manual test protocol covering all 3 leaderboard categories and auto-refresh
+- [ ] Coordinate with Dev 4 to align visual style between web and Android leaderboard views
 
 #### All Developers
 - [ ] Resolve all SonarCloud blocker and critical issues
@@ -185,9 +218,13 @@ and finalize the application for delivery.
 ### Sprint 3 Definition of Done
 - [ ] Cheat mechanic (two-finger swipe) working
 - [ ] Biometric authentication (and PIN fallback) working end-to-end
-- [ ] All 5 card types fully functional
-- [ ] Full Gemini AI integration with all 4 personas
-- [ ] All 3 leaderboard categories populated and displayed
+- [ ] All 7 card types fully functional (including Suppress the Post, Echo Chamber)
+- [ ] FreedomFeed: player posts move asset prices end-to-end
+- [ ] FreedomFeed: AI persona reactions to player posts working
+- [ ] Verified status purchasable and doubling post market impact
+- [ ] Full Gemini AI integration with all 4 personas + player post analysis prompt
+- [ ] All 3 leaderboard categories populated and displayed (Android + Web)
+- [ ] Web leaderboard accessible in browser at stable public URL
 - [ ] App installable and runnable on Android device (Min SDK 26)
 - [ ] SonarCloud Quality Gate passed
 - [ ] Zero blocker/critical code issues

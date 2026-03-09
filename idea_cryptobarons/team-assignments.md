@@ -10,7 +10,11 @@ Each team member must **fully own** at least one feature, covering:
 
 ---
 
-## Developer Assignments (6-Person Team)
+## Developer Assignments (7-Person Team)
+
+> A 7th developer is required to own the **Web Leaderboard Interface**, which is a grading
+> requirement for groups of 6–8 members. Dev 6 retains the backend leaderboard logic and
+> database ownership; Dev 7 owns the browser-based frontend for the leaderboard.
 
 ---
 
@@ -145,22 +149,23 @@ Each team member must **fully own** at least one feature, covering:
 
 ---
 
-### Developer 6 — Leaderboard & Persistence
+### Developer 6 — Leaderboard Backend & Persistence
 
-**Owned Feature:** Global Leaderboards
+**Owned Feature:** Global Leaderboard Data Layer & REST API
 
 **Responsibilities:**
-- Database schema for all leaderboard statistics
+- Database schema for all leaderboard statistics and game history
 - JPA entities and repositories for all tables
-- `LeaderboardService.kt` — ranking calculation logic
-- REST API endpoints for all 3 leaderboard categories
+- `LeaderboardService.kt` — ranking calculation logic for all 3 categories
+- REST API endpoints for all 3 leaderboard categories (consumed by both Android app and Web UI)
 - Android leaderboard screen (Retrofit integration, RecyclerView/LazyColumn)
 - Post-game screen with session summary and rank update
+- CORS configuration on leaderboard endpoints (required by Web UI)
 
 **Key Deliverables:**
 - JPA entities: `Player`, `GameSession`, `LeaderboardEntry`, `Transaction`
 - Flyway migration scripts for all tables
-- `LeaderboardController.kt` — REST endpoints
+- `LeaderboardController.kt` — REST endpoints with CORS enabled
 - Android `LeaderboardFragment` / Compose screen
 - ER diagram (final, approved)
 
@@ -169,25 +174,66 @@ Each team member must **fully own** at least one feature, covering:
 - Repository integration tests (H2 in-memory for CI)
 - Android unit tests for leaderboard data binding
 - End-to-end test: game ends → stats persisted → leaderboard updated
+- REST endpoint test: verify CORS headers are present for browser requests
+
+---
+
+### Developer 7 — Web Leaderboard Interface
+
+**Owned Feature:** Browser-Based Leaderboard Frontend
+
+> **Required by grading criteria** for groups of 6–8 members: the leaderboard must include
+> a "Web Interface" accessible from a browser, separate from the Android app.
+
+**Responsibilities:**
+- Design and implement a responsive static web page displaying all 3 leaderboard categories
+- Fetch leaderboard data via `fetch()` from the REST API (no login required)
+- Auto-refresh rankings every 30 seconds
+- Hosting decision: place files in Spring Boot `src/main/resources/static/leaderboard/`
+  (simplest, deploys with backend) or set up GitHub Pages as alternative
+- Coordinate with Dev 6 to confirm REST response format and ensure CORS is configured
+- Write basic JavaScript tests (or manual test protocol)
+
+**Key Deliverables:**
+- `index.html` — main leaderboard page (3 tabs or sections for each category)
+- `styles.css` — responsive layout (Flexbox/Grid), styled to match game theme
+- `leaderboard.js` — `fetch()` calls, DOM updates, `setInterval` auto-refresh
+- `README.md` in web folder — how to run/deploy the web interface
+- Wireframe / mockup of the web UI (Sprint 1)
+
+**Page Structure:**
+```
+Crypto Barons – Global Leaderboard
+├── Tab 1: "Biggest Rug Pull"     → GET /api/v1/leaderboard/biggest-rug-pull
+├── Tab 2: "Most Pardons Used"    → GET /api/v1/leaderboard/most-pardons
+└── Tab 3: "Top 1% Elite"         → GET /api/v1/leaderboard/top-1-percent
+    (each tab: rank table with player name, value, date; auto-refresh every 30s)
+```
+
+**Tests to Write:**
+- Manual test protocol: page loads with real backend data, refresh works, all 3 tabs render
+- (Optional) JavaScript unit tests for data-parsing and DOM-rendering functions
 
 ---
 
 ## Responsibility Matrix (RACI)
 
-| Task | Dev 1 | Dev 2 | Dev 3 | Dev 4 | Dev 5 | Dev 6 |
-|------|-------|-------|-------|-------|-------|-------|
-| CI/CD Pipeline | **R** | I | I | I | I | I |
-| SonarCloud | **R** | C | C | C | C | C |
-| DB Schema | C | C | I | I | I | **R** |
-| Game State Machine | I | **R** | C | I | C | I |
-| Card Effects | I | **R** | I | C | I | I |
-| Gemini API | I | **R** | C | I | I | I |
-| WebSocket Server | C | C | **R** | I | I | I |
-| Android WebSocket | I | I | **R** | C | I | I |
-| Android UI | I | I | C | **R** | C | C |
-| Biometric Auth | I | I | I | C | **R** | I |
-| Cheat Gesture | I | I | I | C | **R** | I |
-| Leaderboard BE | I | I | I | I | I | **R** |
-| Leaderboard FE | I | I | I | C | I | **R** |
+| Task | Dev 1 | Dev 2 | Dev 3 | Dev 4 | Dev 5 | Dev 6 | Dev 7 |
+|------|-------|-------|-------|-------|-------|-------|-------|
+| CI/CD Pipeline | **R** | I | I | I | I | I | I |
+| SonarCloud | **R** | C | C | C | C | C | I |
+| DB Schema | C | C | I | I | I | **R** | I |
+| Game State Machine | I | **R** | C | I | C | I | I |
+| Card Effects | I | **R** | I | C | I | I | I |
+| Gemini API | I | **R** | C | I | I | I | I |
+| WebSocket Server | C | C | **R** | I | I | I | I |
+| Android WebSocket | I | I | **R** | C | I | I | I |
+| Android UI | I | I | C | **R** | C | C | I |
+| Biometric Auth | I | I | I | C | **R** | I | I |
+| Cheat Gesture | I | I | I | C | **R** | I | I |
+| Leaderboard BE + API | I | I | I | I | I | **R** | C |
+| Leaderboard Android UI | I | I | I | C | I | **R** | I |
+| Web Leaderboard UI | I | I | I | I | I | C | **R** |
+| CORS Configuration | I | I | I | I | I | **R** | C |
 
 *R = Responsible, C = Consulted, I = Informed*
